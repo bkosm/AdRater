@@ -1,35 +1,28 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import auth from '@react-native-firebase/auth';
 
 import { AdMobBanner } from 'expo-ads-admob';
-
-const androidBannerId = "ca-app-pub-3940256099942544/6300978111";
-const androidInterId = "ca-app-pub-3940256099942544/8691691433";
-const androidRewardedId = "ca-app-pub-3940256099942544/5224354917";
+import { registerUser } from "./utility/firebase";
+import { User } from "./utility/models";
+import moment from "moment";
+import { AdUnitIds } from "./utility/helpers";
 
 export default () => {
-    const {width, height} = useWindowDimensions();
+    const { width, height } = useWindowDimensions();
     const styles = createStyles(width, height)
 
     useEffect(() => {
-        auth()
-            .createUserWithEmailAndPassword('jane.doe@example.com', 'SuperSecretPassword!')
-            .then(() => {
-                console.log('User account created & signed in!');
-            })
-            .catch(error => {
-                if (error.code === 'auth/email-already-in-use') {
-                    console.log('That email address is already in use!');
-                }
+        const onLoad = async () => {
+            const result = await registerUser(
+                new User("dupadupa@gmail.com", "Bart", "Kos", moment(), "dk"),
+                "asdfasdf"
+            )
 
-                if (error.code === 'auth/invalid-email') {
-                    console.log('That email address is invalid!');
-                }
+            console.log(result === undefined ? "Account created" : `Could not create account: ${result}`)
+        }
 
-                console.error(error);
-            });
+        onLoad()
     }, [])
 
     return (
@@ -40,7 +33,7 @@ export default () => {
             <AdMobBanner
                 style={styles.banner}
                 bannerSize="fullBanner"
-                adUnitID={androidBannerId}
+                adUnitID={AdUnitIds.banner}
                 servePersonalizedAds={false}
             />
             <StatusBar style="auto"/>
