@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "929080385145",
+    "project_id": "adrater-tsm",
+    "storage_bucket": "adrater-tsm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929080385145:android:a86446be6004b6caabfea8",
+        "android_client_info": {
+          "package_name": "com.adrater"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929080385145-4mml5c7nsnv49vgf8da834ncs8r0eilj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFAY6AqWnObPy1B-P2K8bXPCm1dpu6OEM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "929080385145-4mml5c7nsnv49vgf8da834ncs8r0eilj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
