@@ -1,17 +1,27 @@
 import React, { useState } from 'react'
-import { View,Text } from 'react-native'
+import { View } from 'react-native'
 import SignIn from "./forms/SignIn";
 import { LoginCredentials, User } from "../utility/models";
 import { AuthFailureType, loginUser } from "../utility/firebase";
+// @ts-ignore
+import Restart from 'react-native-restart';
+import { NoticeBar } from "@ant-design/react-native";
+import { LoadingControls } from "../App";
 
-export default () => {
+type Props = {
+    loading: LoadingControls;
+}
+
+export default ({ loading }: Props) => {
     const [error, setError] = useState<string | undefined>()
 
     const onFinish = async (data: LoginCredentials) => {
+        setError(undefined)
+        loading.start()
 
         const result = await loginUser(data.email, data.password)
-
         if (result instanceof User) {
+            Restart.Restart()
         } else {
             switch (result) {
                 case AuthFailureType.EMAIL_NOT_FOUND:
@@ -26,11 +36,14 @@ export default () => {
             }
         }
 
+        loading.stop()
     }
 
     return (
         <View>
-            {error !== undefined && <Text>{error}</Text>}
+            {error !== undefined &&
+            <NoticeBar marqueeProps={{ fps: 200, loop: true }} onPress={() => setError(undefined)}
+                       mode='closable'>{error}</NoticeBar>}
             <SignIn onFinish={onFinish}/>
         </View>
     )

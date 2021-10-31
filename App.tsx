@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native'
 import Home from "./components/Home";
 import Rate from "./components/Rate";
@@ -6,23 +6,42 @@ import Login from "./components/Login";
 import { Provider, Tabs } from "@ant-design/react-native";
 import { isLoggedIn } from "./utility/firebase";
 import Signup from "./components/Signup";
+import Spinner from "react-native-loading-spinner-overlay";
 
-
-const getTabs = () => {
-    if (isLoggedIn()) {
-        return [{ title: 'Home', render: () => <Home/> },
-            { title: 'Rate ads', render: () => <Rate/> }]
-    } else {
-        return [{ title: 'Home', render: () => <Home/> },
-            { title: 'Log in', render: () => <Login/> },
-            { title: 'Sign up', render: () => <Signup/> }]
-    }
+export type LoadingControls = {
+    start: () => void;
+    stop: () => void;
 }
 
 export default () => {
-    const tabs = getTabs()
+    const [isLoading, setIsLoading] = useState(false)
+
+    const controls: LoadingControls = useMemo(() => ({
+        start: () => setIsLoading(true),
+        stop: () => setIsLoading(false),
+    }), [setIsLoading])
+
+    const tabs = useMemo(() => {
+        if (isLoggedIn()) {
+            return [{ title: 'Home', render: () => <Home/> },
+                { title: 'Rate ads', render: () => <Rate loading={controls}/> }]
+        } else {
+            return [{ title: 'Home', render: () => <Home/> },
+                { title: 'Log in', render: () => <Login loading={controls}/> },
+                { title: 'Sign up', render: () => <Signup loading={controls}/> }]
+        }
+    }, [controls])
+
     return (
         <Provider>
+            <Spinner
+                visible={isLoading}
+                textContent='Please wait a second...'
+                size='large'
+                animation='fade'
+                overlayColor='#FFFE'
+            />
+
             <View style={{ flex: 1, marginTop: 30 }}>
                 <Tabs
                     tabs={tabs}
@@ -34,13 +53,13 @@ export default () => {
                                 alignItems: 'center',
                                 justifyContent: 'space-evenly',
                             }}>
-                            {tabProps.tabs.filter(t => t.title !== 'Rate ads').map((tab, i) => (
+                            {tabProps.tabs.map((tab, i) => (
                                 <TouchableOpacity
                                     activeOpacity={0.9}
                                     key={tab.key || i}
                                     style={{ padding: 6, }}
                                     onPress={() => tabProps.goToTab(i)}>
-                                    <Text style={{ color: tabProps.activeTab === i ? 'green' : undefined, }}>
+                                    <Text style={{ color: tabProps.activeTab === i ? 'blue' : undefined }}>
                                         {tab.title}
                                     </Text>
                                 </TouchableOpacity>
