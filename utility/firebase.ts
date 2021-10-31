@@ -2,7 +2,7 @@ import moment from "moment";
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { User } from "./models"
+import { SignUpCredentials, User } from "./models"
 
 
 export enum AuthFailureType {
@@ -23,11 +23,10 @@ export async function signOut() {
     }
 }
 
-export async function registerUser(user: User,
-                                   password: string
-): Promise<undefined | AuthFailureType> {
+export async function registerUser(data: SignUpCredentials): Promise<undefined | AuthFailureType> {
     try {
-        await auth().createUserWithEmailAndPassword(user.email, password);
+        const user = User.fromSignUpCredentials(data)
+        await auth().createUserWithEmailAndPassword(user.email, data.password);
         return await upsertUser(user)
     } catch (error: any) {
         if (error.code !== undefined) {
@@ -91,4 +90,8 @@ async function findUserByEmail(email: string): Promise<User | AuthFailureType> {
             return AuthFailureType.SERVER_ERROR
         }
     }
+}
+
+export async function postScore(): Promise<undefined | string> {
+    return 'test'
 }
