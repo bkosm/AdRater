@@ -27,6 +27,11 @@ export type SignUpCredentials = {
     sex: string;
 }
 
+export type LoginCredentials = {
+    email: string;
+    password: string;
+}
+
 export class User extends Entity {
     email: string;
     firstName: string;
