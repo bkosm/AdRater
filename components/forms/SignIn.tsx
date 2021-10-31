@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { LoginCredentials } from "../../utility/models";
-import { Button, Form, Input } from "antd-mobile";
-import { EMAIL_REGEX } from "../../utility/helpers";
+import Button from "@ant-design/react-native/lib/button";
+import { Formik } from "formik";
+import { KeyboardAvoidingView, ScrollView, TextInput } from "react-native";
 
 
 interface Props {
@@ -9,44 +10,30 @@ interface Props {
 }
 
 export default ({ onFinish }: Props) => {
-    const [form] = Form.useForm();
-    const [, forceUpdate] = useState({});
-
-    useEffect(() => {
-        forceUpdate({});
-    }, []);
-
     return (
-        <Form form={form} name="login" onFinish={onFinish}>
-            <Form.Item
-                name="email"
-                rules={[{ required: true, message: 'Please input your email address!', pattern: EMAIL_REGEX }]}
-            >
-                <Input placeholder="Email"/>
-            </Form.Item>
-            <Form.Item
-                name="password"
-                rules={[{ required: true, message: 'Please input your password!', min: 8 }]}
-            >
-                <Input
-                    type="password"
-                    placeholder="Password"
-                />
-            </Form.Item>
-            <Form.Item shouldUpdate>
-                {() => (
-                    <Button
-                        color="primary"
-                        disabled={
-                            !form.isFieldsTouched(true) ||
-                            !!form.getFieldsError().filter(({ errors }) => errors.length).length
-                        }
-                        onClick={() => onFinish(form.getFieldsValue())}
-                    >
-                        Log in
-                    </Button>
-                )}
-            </Form.Item>
-        </Form>
+        <Formik
+            initialValues={{ email: '', password: '' }}
+            onSubmit={onFinish}>
+            {({ handleChange, handleBlur, handleSubmit, values }) => (
+                <ScrollView>
+                    <KeyboardAvoidingView enabled>
+                        <TextInput
+                            placeholder='Email...'
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
+                            value={values.email}
+                        />
+                        <TextInput
+                            placeholder='Password...'
+                            secureTextEntry={true}
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                        />
+                        <Button onPress={() => handleSubmit()}>Submit</Button>
+                    </KeyboardAvoidingView>
+                </ScrollView>
+            )}
+        </Formik>
     );
 };

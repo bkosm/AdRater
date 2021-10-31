@@ -1,125 +1,127 @@
-import { Button, DatePicker, Form, Input, Selector, } from 'antd-mobile';
-import React, { useEffect, useState } from 'react';
 import { SignUpCredentials } from "../../utility/models";
-import { EMAIL_REGEX, NAME_REGEX } from "../../utility/helpers";
+import { Formik, FormikErrors, FormikValues } from "formik";
+import { KeyboardAvoidingView, ScrollView, Text, TextInput } from "react-native";
+import Button from "@ant-design/react-native/lib/button";
+import React from "react";
+import RadioItem from "@ant-design/react-native/lib/radio/RadioItem";
+import { DatePicker, List } from "@ant-design/react-native";
+import { EMAIL_REGEX, momentYearsAgo } from "../../utility/helpers";
 
 interface Props {
     onFinish: (v: SignUpCredentials) => Promise<void>
 }
 
 export default ({ onFinish }: Props) => {
-    const [form] = Form.useForm();
-    const [, forceUpdate] = useState({});
-    const [password, setPassword] = useState('')
-    const [pickerVisible, setPickerVisible] = useState(false)
-
-    useEffect(() => {
-        forceUpdate({});
-    }, []);
-
     return (
-        <Form
-            form={form}
-            layout="horizontal"
-            onFinish={onFinish}
-        >
-            <Form.Item label="Email" name='email'
-                       rules={[{
-                           required: true,
-                           message: 'Type in a correct email address.',
-                           pattern: EMAIL_REGEX
-                       }]}>
-                <Input/>
-            </Form.Item>
-            <Form.Item label="Password" name='password'
-                       rules={[{
-                           required: true,
-                           message: 'Type in a password of minimum 8 characters.',
-                           len: 8,
-                           whitespace: false
-                       }]}>
-                <Input
-                    type="password"
-                    onChange={password => setPassword(password)}
-                />
-            </Form.Item>
-            <Form.Item label="Repeat password" name='passwordRetype'
-                       rules={[{
-                           required: true,
-                           message: 'Type again the same password.',
-                           len: 2,
-                           pattern: NAME_REGEX,
-                           validator: (rule, value, callback) => {
-                               if (value !== password) callback('Passwords do not match')
-                           }
-                       }]}>
-                <Input
-                    type="password"
-                />
-            </Form.Item>
-            <Form.Item label="First name" name='firstName'
-                       rules={[{
-                           required: true,
-                           message: 'Type in your first name, capitalized.',
-                           len: 2,
-                           pattern: NAME_REGEX
-                       }]}>
-                <Input/>
-            </Form.Item>
-            <Form.Item label="Last name" name='lastName'
-                       rules={[{
-                           required: true,
-                           message: 'Type in your last name, capitalized.',
-                           len: 2,
-                           pattern: NAME_REGEX
-                       }]}>
-                <Input/>
-            </Form.Item>
-            <Form.Item label="Sex" name="sex" rules={[{ required: true }]}>
-                <Selector
-                    columns={3}
-                    options={[
-                        { label: 'Male', value: 'male' },
-                        { label: 'Female', value: 'female' },
-                        { label: 'Non-binary', value: 'nb' },
-                    ]}
-                />
-            </Form.Item>
+        <Formik
+            initialValues={{
+                email: '',
+                password: '',
+                passwordRetype: '',
+                firstName: '',
+                lastName: '',
+                sex: '',
+                dateOfBirth: momentYearsAgo(13)
+            }}
+            validate={(values) => {
+                const errors: FormikErrors<FormikValues> = {}
 
-            <Form.Item label="Date of birth" name="dateOfBirth"
-                       rules={[{ required: true, message: 'You have to supply your birth date.' }]}>
-                <Button
-                    style={{ marginRight: '1rem' }}
-                    onClick={() => {
-                        setPickerVisible(true)
-                    }}>
-                    Choose date
-                </Button>
-                <DatePicker
-                    title='Date of birth'
-                    visible={pickerVisible}
-                    confirmText='Confirm'
-                    cancelText='Cancel'
-                    onCancel={() => setPickerVisible(false)}
-                    onConfirm={() => setPickerVisible(false)}
-                >
-                    {value => value?.toLocaleDateString()}
-                </DatePicker>
-            </Form.Item>
-            <Form.Item label=" " shouldUpdate>
-                {() => (
-                    <Button
-                        color="primary"
-                        onClick={() => onFinish(form.getFieldsValue())}
-                        disabled={
-                            !form.isFieldsTouched(true) ||
-                            !!form.getFieldsError().filter(({ errors }) => errors.length).length
-                        }
-                    >
-                        Sign up
-                    </Button>
-                )}
-            </Form.Item>
-        </Form>
+                if (!EMAIL_REGEX.test(values.email)) {
+                    errors.email = "Provide a valid email address!"
+                }
+                if (values.password.length < 8) {
+                    errors.password = "The password must have at least 8 characters!"
+                }
+                if (values.password === values.passwordRetype) {
+                    errors.passwordRetype = "Passwords do not match!"
+                }
+                if (!values.firstName.trim().length) {
+                    errors.firstName = "First name is required."
+                }
+                if (!values.lastName.trim().length) {
+                    errors.lastName = "Last name is required."
+                }
+                if (!values.sex.trim().length) {
+                    errors.sex = "Gender is required."
+                }
+
+                return errors
+            }}
+            onSubmit={values => onFinish({ ...values } as SignUpCredentials)}>
+            {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+                <ScrollView>
+                    <KeyboardAvoidingView enabled>
+                        <TextInput
+                            placeholder='Email...'
+                            onChangeText={handleChange('email')}
+                            onBlur={handleBlur('email')}
+                            value={values.email}
+                        />
+                        <TextInput
+                            placeholder='Password...'
+                            secureTextEntry={true}
+                            onChangeText={handleChange('password')}
+                            onBlur={handleBlur('password')}
+                            value={values.password}
+                        />
+                        <TextInput
+                            placeholder='Repeat password...'
+                            secureTextEntry={true}
+                            onChangeText={handleChange('passwordRetype')}
+                            onBlur={handleBlur('passwordRetype')}
+                            value={values.passwordRetype}
+                        />
+                        <TextInput
+                            placeholder='First name...'
+                            onChangeText={handleChange('firstName')}
+                            onBlur={handleBlur('firstName')}
+                            value={values.firstName}
+                        />
+                        <TextInput
+                            placeholder='Last name...'
+                            onChangeText={handleChange('lastName')}
+                            onBlur={handleBlur('lastName')}
+                            value={values.lastName}
+                        />
+
+                        <List style={{ marginTop: 12 }}>
+                            <Text style={{ marginTop: 12 }}>
+                                Gender
+                            </Text>
+                            <RadioItem
+                                checked={values.sex === 'male'}
+                                onPress={() => setFieldValue('sex', 'male')}>
+                                Male
+                            </RadioItem>
+                            <RadioItem
+                                checked={values.sex === 'female'}
+                                onPress={() => setFieldValue('sex', 'female')}>
+                                Female
+                            </RadioItem>
+                            <RadioItem
+                                checked={values.sex === 'nb'}
+                                onPress={() => setFieldValue('sex', 'nb')}>
+                                Non-binary
+                            </RadioItem>
+                        </List>
+
+                        <List>
+                            <DatePicker
+                                value={values.dateOfBirth.toDate()}
+                                mode="date"
+                                minDate={momentYearsAgo(100).toDate()}
+                                maxDate={momentYearsAgo(12).toDate()}
+                                onChange={value => setFieldValue('dateOfBirth', value)}
+                                format="YYYY-MM-DD"
+                            >
+                                <List.Item arrow="horizontal">Select Date</List.Item>
+                            </DatePicker>
+                        </List>
+
+                        <Button onPress={() => handleSubmit()}>Create an account</Button>
+                    </KeyboardAvoidingView>
+                </ScrollView>
+            )}
+        </Formik>
     );
 };
