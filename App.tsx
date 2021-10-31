@@ -23,12 +23,12 @@ export default () => {
 
     const tabs = useMemo(() => {
         if (isLoggedIn()) {
-            return [{ title: 'Home', render: () => <Home/> },
-                { title: 'Rate ads', render: () => <Rate loading={controls}/> }]
+            return [{ title: 'Home', render: (key: number) => <Home key={key}/> },
+                { title: 'Rate ads', render: (key: number) => <Rate key={key} loading={controls}/> }]
         } else {
-            return [{ title: 'Home', render: () => <Home/> },
-                { title: 'Log in', render: () => <Login loading={controls}/> },
-                { title: 'Sign up', render: () => <Signup loading={controls}/> }]
+            return [{ title: 'Home', render: (key: number) => <Home key={key}/> },
+                { title: 'Log in', render: (key: number) => <Login key={key} loading={controls}/> },
+                { title: 'Sign up', render: (key: number) => <Signup key={key} loading={controls}/> }]
         }
     }, [controls])
 
@@ -66,7 +66,7 @@ export default () => {
                             ))}
                         </View>
                     )}>
-                    {tabs.map(t => t.render())}
+                    {tabs.map((t, i) => t.render(i))}
                 </Tabs>
             </View>
         </Provider>

@@ -1,4 +1,4 @@
-rootProject.name = 'adrater-native'
+rootProject.name = 'Ad Rater'
 include ':react-native-restart'
 project(':react-native-restart').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-restart/android')
 

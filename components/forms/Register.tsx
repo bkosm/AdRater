@@ -103,26 +103,30 @@ export default ({ onFinish }: Props) => {
                         <Text style={errorStyle}>{errors.lastName && touched.lastName && errors.lastName}</Text>
                         <List>
                             <RadioItem
+                                key='male'
                                 checked={values.sex === 'male'}
                                 onChange={() => setFieldValue('sex', 'male')}>
                                 Male
                             </RadioItem>
                             <RadioItem
+                                key='female'
                                 checked={values.sex === 'female'}
                                 onChange={() => setFieldValue('sex', 'female')}>
                                 Female
                             </RadioItem>
                             <RadioItem
+                                key='nb'
                                 checked={values.sex === 'nb'}
                                 onChange={() => setFieldValue('sex', 'nb')}>
                                 Non-binary
                             </RadioItem>
-                            <Text style={errorStyle}>{errors.sex && touched.sex && errors.sex}</Text>
+                            <Text key='radio-error' style={errorStyle}>{errors.sex && touched.sex && errors.sex}</Text>
                         </List>
 
                         <List>
                             <DatePicker
-                                value={values.dateOfBirth?.toDate()} //@tsignore
+                                key='dob' //@ts-ignore
+                                value={values.dateOfBirth?.toDate()}
                                 mode="date"
                                 minDate={momentYearsAgo(100).toDate()}
                                 maxDate={momentYearsAgo(12).toDate()}
@@ -141,9 +145,9 @@ export default ({ onFinish }: Props) => {
                                     }
                                 }}
                             >
-                                <List.Item arrow="horizontal">Date of birth</List.Item>
+                                <List.Item key='dob-pick' arrow="horizontal">Date of birth</List.Item>
                             </DatePicker>
-                            <Text
+                            <Text key='date-error'
                                 style={errorStyle}>{errors.dateOfBirth && touched.dateOfBirth && errors.dateOfBirth}</Text>
                         </List>
 
