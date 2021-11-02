@@ -12,7 +12,7 @@ export default () => {
     }, [])
 
     return (
-        <View style={{padding: 30}}>
+        <View style={{ padding: 30 }}>
             <Text style={styles.header}>Welcome to AdRater!</Text>
             <Text style={styles.text}>This is a university project web application designed to make you rate ads!</Text>
             <Text style={styles.bold}>Cool, right?!</Text>

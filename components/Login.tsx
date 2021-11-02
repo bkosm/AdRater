@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View } from 'react-native'
 import SignIn from "./forms/SignIn";
 import { LoginCredentials, User } from "../utility/models";
-import { AuthFailureType, loginUser } from "../utility/firebase";
+import { NetworkFailure, loginUser } from "../utility/firebase";
 // @ts-ignore
 import Restart from 'react-native-restart';
 import { NoticeBar } from "@ant-design/react-native";
@@ -24,13 +24,13 @@ export default ({ loading }: Props) => {
             Restart.Restart()
         } else {
             switch (result) {
-                case AuthFailureType.EMAIL_NOT_FOUND:
+                case NetworkFailure.EMAIL_NOT_FOUND:
                     setError('A user with given e-mail does not exist.')
                     break;
-                case AuthFailureType.WRONG_CREDENTIALS:
+                case NetworkFailure.WRONG_CREDENTIALS:
                     setError('The provided credentials are invalid.')
                     break;
-                case AuthFailureType.SERVER_ERROR:
+                case NetworkFailure.SERVER_ERROR:
                     setError('Our backend cannot be reached, please try again later.')
                     break;
             }

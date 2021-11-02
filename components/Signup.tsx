@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View } from 'react-native'
 import Register from "./forms/Register";
 import { SignUpCredentials } from "../utility/models";
-import { AuthFailureType, registerUser } from "../utility/firebase";
+import { NetworkFailure, registerUser } from "../utility/firebase";
 import { NoticeBar } from "@ant-design/react-native";
 import { LoadingControls } from "../App";
 // @ts-ignore
@@ -23,13 +23,13 @@ export default ({ loading }: Props) => {
 
         if (result !== undefined) {
             switch (result) {
-                case AuthFailureType.EMAIL_IN_USE:
+                case NetworkFailure.EMAIL_IN_USE:
                     setError('A user with given e-mail already exists.')
                     break;
-                case AuthFailureType.WEAK_PASSWORD:
+                case NetworkFailure.WEAK_PASSWORD:
                     setError('The provided password is too weak. Try typing special characters.')
                     break;
-                case AuthFailureType.SERVER_ERROR:
+                case NetworkFailure.SERVER_ERROR:
                     setError('Our backend cannot be reached, please try later.')
                     break;
             }
