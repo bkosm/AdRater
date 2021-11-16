@@ -54,16 +54,16 @@ export class User extends Entity {
 }
 
 export class AdRate extends Entity {
-    vendor: string;
+    unitId: string;
     type: string;
     user: User;
     score: number;
     timestamp: Moment;
 
-    constructor(user: User, vendor: string, type: string, score: number, timestamp: Moment, id?: string) {
+    constructor(user: User, unitId: string, type: string, score: number, timestamp: Moment, id?: string) {
         super(id);
         this.user = user;
-        this.vendor = vendor;
+        this.unitId = unitId;
         this.type = type;
         this.score = score;
         this.timestamp = timestamp;

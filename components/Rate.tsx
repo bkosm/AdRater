@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { RefreshControl, SafeAreaView, ScrollView, Text, ToastAndroid, View } from 'react-native'
 import { fetchCurrentUser, NetworkFailure, postScore, signOut } from "../utility/firebase";
 import { AdMobBanner } from "expo-ads-admob";
-import { AdUnitIds } from "../utility/helpers";
-import { NoticeBar, Slider, WhiteSpace } from "@ant-design/react-native";
+import { NoticeBar, WhiteSpace } from "@ant-design/react-native";
 import Button from "@ant-design/react-native/lib/button";
 // @ts-ignore
 import Restart from 'react-native-restart';
@@ -12,6 +11,15 @@ import { AdRate, User } from "../utility/models";
 import moment from "moment";
 // @ts-ignore
 import BigSlider from 'react-native-big-slider'
+import {
+    Ad,
+    displayInterstitial,
+    displayRewarded,
+    isBanner,
+    isInterstitial,
+    isRewarded,
+    randomAd
+} from "../utility/ads";
 
 const formatter = (value: number) => {
     switch (value) {
@@ -46,10 +54,22 @@ type Props = {
     loading: LoadingControls;
 }
 
+const showToast = (text: string) => {
+    ToastAndroid.showWithGravity(
+        text,
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER
+    );
+};
+
+
 export default ({ loading }: Props) => {
     const [score, setScore] = useState(5)
     const [error, setError] = useState<string | undefined>(undefined)
     const [user, setUser] = useState<User | undefined>()
+    const [ad, setAd] = useState<Ad>(() => randomAd())
+    const [refreshing, setRefreshing] = useState(false)
+    const [disableRating, setDisableRating] = useState(false)
 
     useEffect(() => {
         const fetch = async () => {
@@ -69,10 +89,27 @@ export default ({ loading }: Props) => {
                 }
             }
 
+            setAd(randomAd())
             loading.stop()
         }
         fetch()
     }, [setUser])
+
+    useEffect(() => {
+        console.log('whoa')
+        if (!isBanner(ad)) {
+            const fetch = async () => {
+                loading.start()
+                if (isInterstitial(ad)) {
+                    await displayInterstitial(ad.unitId)
+                } else if (isRewarded(ad)) {
+                    await displayRewarded(ad.unitId)
+                }
+                loading.stop()
+            }
+            fetch()
+        }
+    }, [ad])
 
     const doLogout = async () => {
         loading.start()
@@ -84,48 +121,50 @@ export default ({ loading }: Props) => {
         setError(undefined)
         loading.start()
 
-        const result = await postScore(new AdRate(user!!, 'vendor', 'type', score, moment()))
+        const result = await postScore(new AdRate(user!!, ad.unitId, ad.name, score, moment()))
 
         if (result !== undefined) {
             setError('There was an error')
         } else {
-            //TODO SUCCESS
+            showToast("Great job! Pull down to refresh and rate another!")
+            setDisableRating(true)
             setScore(5)
         }
 
         loading.stop()
     }
 
+    const onRefresh = () => {
+        setRefreshing(true)
+        setAd(randomAd())
+        setDisableRating(false)
+        setRefreshing(false)
+    }
+
     return (
-        <View>
-            {error !== undefined &&
-            <NoticeBar marqueeProps={{ fps: 200, loop: true }} onPress={() => setError(undefined)}
-                       mode='closable'>{error}</NoticeBar>}
+        <SafeAreaView>
+            {error !== undefined && <NoticeBar
+                marqueeProps={{ fps: 200, loop: true }}
+                onPress={() => setError(undefined)}
+                mode='closable'>{error}</NoticeBar>}
+
             <ScrollView style={{ padding: 30 }}>
-                {user !== undefined && <Text style={{
-                    textAlign: 'center',
-                    color: 'white',
-                    fontSize: 25,
-                }}>Hi {user.firstName}!</Text>}
 
-                <WhiteSpace size='xl'/>
-
-                <AdMobBanner
+                {isBanner(ad) && <AdMobBanner
                     style={{
-                        width: '100%',
                         justifyContent: "center",
                         alignItems: "center",
                         marginBottom: 20
                     }}
                     bannerSize="fullBanner"
-                    adUnitID={AdUnitIds.banner}
-                    servePersonalizedAds={false}
-                />
+                    adUnitID={ad.unitId}
+                    servePersonalizedAds={true}
+                />}
 
                 <WhiteSpace size='xl'/>
 
                 <BigSlider
-                    renderLabel={() => <Text style={{textAlign: 'center', padding: 20 }}>
+                    renderLabel={() => <Text style={{ textAlign: 'center', padding: 20 }}>
                         {formatter(score)}
                     </Text>}
                     trackStyle={{ backgroundColor: 'grey' }}
@@ -144,16 +183,20 @@ export default ({ loading }: Props) => {
 
                 <WhiteSpace size='xl'/>
 
-                <Button onPress={sendRate} disabled={user === undefined} type="primary">
-                    Rate this ad!
-                </Button>
+                <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
+                    <Button onPress={sendRate} disabled={user === undefined || disableRating} type="primary">
+                        Rate this ad!
+                    </Button>
 
-                <WhiteSpace size='xl'/>
+                    <WhiteSpace size='xl'/>
 
-                <Button onPress={doLogout} type="ghost">
-                    Log me out
-                </Button>
+                    <Button onPress={doLogout} type="ghost">
+                        Log me out
+                    </Button>
+
+                    <WhiteSpace size='xl'/>
+                </ScrollView>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     )
 }

@@ -98,5 +98,17 @@ async function findUserByEmail(email: string): Promise<User | NetworkFailure> {
 }
 
 export async function postScore(rate: AdRate): Promise<undefined | NetworkFailure> {
-    return NetworkFailure.SERVER_ERROR
+    try {
+        await firestore().collection('rates').doc(rate.getId()).set({
+            ...rate,
+            timestamp: rate.timestamp.toDate().toISOString(),
+            user: {
+                ...rate.user,
+                dateOfBirth: rate.user.dateOfBirth.toDate().toLocaleDateString(),
+            }
+        })
+        return undefined
+    } catch (_: any) {
+        return NetworkFailure.SERVER_ERROR
+    }
 }

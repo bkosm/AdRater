@@ -5,8 +5,3 @@ export const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|
 export const NAME_REGEX = /^[A-Z][a-z]*$/;
 export const momentYearsAgo = (amount: number) => moment().subtract(amount, 'years')
 export const isWeb = () => Platform.OS === 'web'
-export const AdUnitIds = {
-    banner: "ca-app-pub-3940256099942544/6300978111",
-    interstitial: "ca-app-pub-3940256099942544/8691691433",
-    rewarded: "ca-app-pub-3940256099942544/5224354917",
-}
