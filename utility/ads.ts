@@ -5,10 +5,9 @@ const AdUnitIds = {
     interstitial: "ca-app-pub-3940256099942544/1033173712",
     interstitialVideo: "ca-app-pub-3940256099942544/8691691433",
     rewarded: "ca-app-pub-3940256099942544/5224354917",
-    rewardedInterstitial: "ca-app-pub-3940256099942544/5354046379",
-    appOpen: "ca-app-pub-3940256099942544/3419835294",
-    nativeAdvanced: "ca-app-pub-3940256099942544/2247696110",
-    nativeAdvancedVideo: "ca-app-pub-3940256099942544/1044960115",
+    //rewardedInterstitial: "ca-app-pub-3940256099942544/5354046379", // ERROR_CODE_NO_FILL
+    //nativeAdvanced: "ca-app-pub-3940256099942544/2247696110", // ERROR_CODE_NO_FILL
+    //nativeAdvancedVideo: "ca-app-pub-3940256099942544/1044960115", // ERROR_CODE_NO_FILL
 }
 
 export type Ad = {
@@ -16,19 +15,10 @@ export type Ad = {
     unitId: string;
 }
 
-export const initAd = () => ({})
-
-export const randomAd = (force: string | null = null): Ad => {
-    let randomElement: string[];
-    if (force != null) {
-        // @ts-ignore
-        randomElement = [force, AdUnitIds[force]]
-    } else {
-        const entries = Object.entries(AdUnitIds)
-        randomElement = entries[Math.floor(Math.random() * entries.length)];
-    }
+export const randomAd = (): Ad => {
+    const entries = Object.entries(AdUnitIds)
+    const randomElement = entries[Math.floor(Math.random() * entries.length)];
     const [name, unitId] = randomElement
-    console.log({ name, unitId })
     return { name, unitId }
 }
 
@@ -43,7 +33,7 @@ export const isRewarded = (ad: Ad) =>
 
 export const displayInterstitial = async (unitId: string) => {
     await AdMobInterstitial.setAdUnitID(unitId)
-    await AdMobInterstitial.requestAdAsync({ servePersonalizedAds: true })
+    await AdMobInterstitial.requestAdAsync()
     await AdMobInterstitial.showAdAsync()
 }
 

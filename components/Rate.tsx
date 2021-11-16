@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { RefreshControl, SafeAreaView, ScrollView, Text, ToastAndroid, View } from 'react-native'
+import { RefreshControl, SafeAreaView, ScrollView, Text, ToastAndroid } from 'react-native'
 import { fetchCurrentUser, NetworkFailure, postScore, signOut } from "../utility/firebase";
 import { AdMobBanner } from "expo-ads-admob";
 import { NoticeBar, WhiteSpace } from "@ant-design/react-native";
@@ -96,7 +96,6 @@ export default ({ loading }: Props) => {
     }, [setUser])
 
     useEffect(() => {
-        console.log('whoa')
         if (!isBanner(ad)) {
             const fetch = async () => {
                 loading.start()
@@ -148,7 +147,8 @@ export default ({ loading }: Props) => {
                 onPress={() => setError(undefined)}
                 mode='closable'>{error}</NoticeBar>}
 
-            <ScrollView style={{ padding: 30 }}>
+            <ScrollView style={{ padding: 30 }}
+                        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
 
                 {isBanner(ad) && <AdMobBanner
                     style={{
@@ -158,7 +158,6 @@ export default ({ loading }: Props) => {
                     }}
                     bannerSize="fullBanner"
                     adUnitID={ad.unitId}
-                    servePersonalizedAds={true}
                 />}
 
                 <WhiteSpace size='xl'/>
@@ -183,19 +182,16 @@ export default ({ loading }: Props) => {
 
                 <WhiteSpace size='xl'/>
 
-                <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
-                    <Button onPress={sendRate} disabled={user === undefined || disableRating} type="primary">
-                        Rate this ad!
-                    </Button>
+                <Button onPress={sendRate} disabled={user === undefined || disableRating} type="primary">
+                    Rate this ad!
+                </Button>
 
-                    <WhiteSpace size='xl'/>
+                <WhiteSpace size='xl'/>
 
-                    <Button onPress={doLogout} type="ghost">
-                        Log me out
-                    </Button>
+                <Button onPress={doLogout} type="ghost">
+                    Log me out
+                </Button>
 
-                    <WhiteSpace size='xl'/>
-                </ScrollView>
             </ScrollView>
         </SafeAreaView>
     )
