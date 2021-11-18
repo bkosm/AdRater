@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { RefreshControl, SafeAreaView, ScrollView, Text, ToastAndroid } from 'react-native'
+import { Image, RefreshControl, SafeAreaView, ScrollView, Text, ToastAndroid } from 'react-native'
 import { fetchCurrentUser, getRateCount, NetworkFailure, postScore, signOut } from "../utility/firebase";
 import { AdMobBanner } from "expo-ads-admob";
 import { NoticeBar, WhiteSpace } from "@ant-design/react-native";
@@ -60,6 +60,41 @@ const showToast = (text: string) =>
         ToastAndroid.SHORT,
         ToastAndroid.CENTER
     );
+
+const getBadge = (counter: number): NodeRequire => {
+    const rounded = Math.floor(counter / 10)
+
+    switch (rounded) {
+        case 1:
+            return require('../assets/badge-10.png')
+        case 2:
+            return require('../assets/badge-20.png')
+        case 3:
+            return require('../assets/badge-30.png')
+        case 4:
+            return require('../assets/badge-40.png')
+        case 5:
+            return require('../assets/badge-50.png')
+        case 6:
+            return require('../assets/badge-60.png')
+        case 7:
+            return require('../assets/badge-70.png')
+        case 8:
+            return require('../assets/badge-80.png')
+        case 9:
+            return require('../assets/badge-90.png')
+        case 10:
+            return require('../assets/badge-100.png')
+        case 11:
+            return require('../assets/badge-110.png')
+        case 12:
+            return require('../assets/badge-120.png')
+        case 13:
+            return require('../assets/badge-130.png')
+        default:
+            return require('../assets/badge-0.png')
+    }
+}
 
 export default ({ loading }: Props) => {
     const [score, setScore] = useState(0)
@@ -213,10 +248,20 @@ export default ({ loading }: Props) => {
 
                 <WhiteSpace size='xl'/>
 
+                <Image
+                    style={{ height: 250, resizeMode: 'contain', alignSelf: 'center' }}
+                    source={getBadge(counter)}
+                />
+
+                <WhiteSpace size='xl'/>
+
                 <Text style={{ fontSize: 30, textAlign: 'center' }}>You have rated <Text
                     style={{ fontWeight: 'bold' }}>{counter}</Text> ad{counter == 1 ? '' : 's'}!</Text>
 
                 <WhiteSpace size='xl'/>
+                <WhiteSpace size='xl'/>
+                <WhiteSpace size='xl'/>
+
             </ScrollView>
         </SafeAreaView>
     )
