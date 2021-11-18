@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextStyle, View } from 'react-native'
 
 export default () => {
     const styles = useMemo(() => {
-        const baseText: TextStyle = { textAlign: 'center', color: 'white', fontSize: 18, marginBottom: 20 }
+        const baseText: TextStyle = { textAlign: 'center', fontSize: 18, marginBottom: 20 }
         return StyleSheet.create({
             header: { ...baseText, fontSize: 30, marginTop: 20, marginBottom: 50 },
             text: { ...baseText },

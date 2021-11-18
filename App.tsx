@@ -43,7 +43,8 @@ export default () => {
                 textContent='Please wait a second...'
                 size='large'
                 animation='fade'
-                overlayColor='#FFFE'
+                overlayColor='#FFFFFF'
+                color='#000000'
             />
 
             <View style={{ flex: 1, marginTop: 30 }}>

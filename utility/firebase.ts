@@ -77,6 +77,7 @@ async function upsertUser(user: User): Promise<undefined | NetworkFailure> {
             ...user,
             dateOfBirth: user.dateOfBirth.toDate().toLocaleDateString()
         })
+        await firestore().collection('rateCounter').doc(user.email).set({ ratesCount: 0 })
         return undefined
     } catch (_: any) {
         return NetworkFailure.SERVER_ERROR
@@ -107,7 +108,19 @@ export async function postScore(rate: AdRate): Promise<undefined | NetworkFailur
                 dateOfBirth: rate.user.dateOfBirth.toDate().toLocaleDateString(),
             }
         })
+        await firestore().collection('rateCounter').doc(rate.user.email).update({
+            ratesCount: firestore.FieldValue.increment(1)
+        })
         return undefined
+    } catch (_: any) {
+        return NetworkFailure.SERVER_ERROR
+    }
+}
+
+export async function getRateCount(user: User): Promise<number | NetworkFailure> {
+    try {
+        const document = (await firestore().collection('rateCounter').doc(user.email).get()).data()!!
+        return document['ratesCount']
     } catch (_: any) {
         return NetworkFailure.SERVER_ERROR
     }
